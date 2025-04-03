@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jarvis Statistical Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input, select, button {
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px 15px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #answer, #result {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #e9f7ef;
+            border-left: 4px solid #4CAF50;
+        }
+        .error {
+            color: red;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+        .plot-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .plot-container img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .dynamic-fields {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Jarvis Statistical Assistant</h1>
+
+        <!-- Ask Jarvis a question -->
+        <div class="section">
+            <h2>Ask a Question</h2>
+            <form id="askForm">
+                <label for="question">Enter your statistical question:</label>
+                <input type="text" id="question" name="question" required style="width: 100%;">
+                <button type="submit">Ask Jarvis</button>
+            </form>
+            <div id="answer"></div>
+        </div>
+
+        <!-- Upload file and analyze -->
+        <div class="section">
+            <h2>Data Analysis</h2>
+            <form id="analyzeForm" enctype="multipart/form-data">
+                <label for="file">Upload your data file (CSV or Excel):</label>
+                <input type="file" id="file" name="file" accept=".csv,.xlsx" required>
+
+                <label for="analysis_type">Select analysis type:</label>
+                <select id="analysis_type" name="analysis_type" required>
+                    <option value="">-- Select Analysis --</option>
+
+                    <!-- Basic Statistics -->
+                    <optgroup label="Basic Statistics">
+                        <option value="central tendency">Central Tendency</option>
+                        <option value="dispersion">Dispersion</option>
+                        <option value="quartiles">Quartiles & Percentiles</option>
+                        <option value="skewness">Skewness & Kurtosis</option>
+                    </optgroup>
+
+                    <!-- Statistical Tests -->
+                    <optgroup label="Statistical Tests">
+                        <option value="normal distribution">Normality Test (Shapiro-Wilk)</option>
+                        <option value="small sample test">T-Test (Single Sample)</option>
+                        <option value="large sample test">Z-Test (Large Sample)</option>
+                        <option value="chi-square test">Chi-Square Test</option>
+                        <option value="two-sample t-test">Two Sample T-Test</option>
+                        <option value="wilcoxon test">Wilcoxon Test</option>
+                        <option value="mann-whitney test">Mann-Whitney U Test</option>
+                        <option value="kruskal-wallis test">Kruskal-Wallis Test</option>
+                        <option value="one-way anova">One-Way ANOVA</option>
+                        <option value="levenes test">Levene's Test</option>
+                    </optgroup>
+
+                    <!-- Visualization -->
+                    <optgroup label="Visualizations">
+                        <option value="scatter plot">Scatter Plot</option>
+                        <option value="box plot">Box Plot</option>
+                        <option value="violin plot">Violin Plot</option>
+                        <option value="swarm plot">Swarm Plot</option>
+                        <option value="bar chart">Bar Chart</option>
+                        <option value="pie chart">Pie Chart</option>
+                        <option value="heatmap">Heatmap</option>
+                        <option value="joint plot">Joint Plot</option>
+                        <option value="pair plot">Pair Plot</option>
+                    </optgroup>
+
+                    <!-- Relationships -->
+                    <optgroup label="Relationships">
+                        <option value="covariance">Covariance</option>
+                        <option value="correlation">Correlation</option>
+                        <option value="regression">Linear Regression</option>
+                    </optgroup>
+                </select>
+
+                <!-- Dynamic Fields -->
+                <div id="columnFields" class="dynamic-fields hidden">
+                    <label for="column">Column:</label>
+                    <input type="text" id="column" name="column">
+                </div>
+
+                <div id="xyFields" class="dynamic-fields hidden">
+                    <label for="x_col">X Column:</label>
+                    <input type="text" id="x_col" name="x_col">
+                    <label for="y_col">Y Column:</label>
+                    <input type="text" id="y_col" name="y_col">
+                </div>
+
+                <div id="multiColFields" class="dynamic-fields hidden">
+                    <label for="cols">Enter multiple column names (comma-separated):</label>
+                    <input type="text" id="cols" name="cols">
+                </div>
+
+                <button type="submit">Analyze</button>
+            </form>
+
+            <div id="result"></div>
+            <div class="plot-container" id="plotContainer"></div>
+            <div id="error" class="error"></div>
+        </div>
+    </div>
+
+    <script>
+        const analysisType = document.getElementById('analysis_type');
+        const columnFields = document.getElementById('columnFields');
+        const xyFields = document.getElementById('xyFields');
+        const multiColFields = document.getElementById('multiColFields');
+
+        analysisType.addEventListener('change', () => {
+            const type = analysisType.value;
+            columnFields.classList.add('hidden');
+            xyFields.classList.add('hidden');
+            multiColFields.classList.add('hidden');
+
+            if (["central tendency", "dispersion", "quartiles", "skewness", "normal distribution", "small sample test", "large sample test", "chi-square test", "box plot", "violin plot", "swarm plot", "bar chart", "pie chart"].includes(type)) {
+                columnFields.classList.remove('hidden');
+            } else if (["scatter plot", "regression", "covariance", "correlation", "joint plot", "two-sample t-test", "wilcoxon test", "mann-whitney test"].includes(type)) {
+                xyFields.classList.remove('hidden');
+            } else if (["kruskal-wallis test", "one-way anova", "levenes test"].includes(type)) {
+                multiColFields.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('askForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const question = document.getElementById('question').value;
+            fetch('/ask', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `question=${encodeURIComponent(question)}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('answer').innerText = data.answer;
+            });
+        });
+
+        document.getElementById('analyzeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const analysisType = formData.get('analysis_type');
+            if (analysisType === 'kruskal-wallis test' || analysisType === 'one-way anova' || analysisType === 'levenes test') {
+                const cols = formData.get('cols').split(',').map(c => c.trim());
+                cols.forEach(col => formData.append('cols[]', col));
+            }
+
+            fetch('/analyze', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('error').innerText = '';
+                document.getElementById('result').innerText = data.text || '';
+                if (data.plot) {
+                    document.getElementById('plotContainer').innerHTML = `<img src="data:image/png;base64,${data.plot}" alt="Plot">`;
+                } else {
+                    document.getElementById('plotContainer').innerHTML = '';
+                }
+                if (data.error) {
+                    document.getElementById('error').innerText = data.error;
+                }
+            })
+            .catch(err => {
+                document.getElementById('error').innerText = "An error occurred: " + err;
+            });
+        });
+    </script>
+</body>
+</html>
