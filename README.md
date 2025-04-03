@@ -23,4 +23,5 @@ StatBot is an AI-powered chatbot that answers **statistical queries**, analyzes 
 
 1. **Clone the repository**:  
    ```bash
-   git clone https://github.com/Nithya1610/StatBot.git && cd StatBot
+   git clone https://github.com/Nithya1610/Statbot-AI-powered-Statistical-Assistant.git && cd Statbot-AI-powered-Statistical-Assistant
+
